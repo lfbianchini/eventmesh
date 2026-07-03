@@ -1,0 +1,5 @@
+services:
+  eventmesh:
+    build:
+      dockerfile: Dockerfile.local
+

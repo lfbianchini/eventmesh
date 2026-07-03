@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: eventmesh
+      POSTGRES_USER: eventmesh
+      POSTGRES_PASSWORD: eventmesh
+    ports:
+      - "${EVENTMESH_POSTGRES_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eventmesh -d eventmesh"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - eventmesh-postgres:/var/lib/postgresql/data
+
+  eventmesh:
+    build:
+      context: .
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      EVENTMESH_DB_URL: jdbc:postgresql://postgres:5432/eventmesh
+      EVENTMESH_DB_USERNAME: eventmesh
+      EVENTMESH_DB_PASSWORD: eventmesh
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${EVENTMESH_PORT:-8088}:8080"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q -O - http://localhost:8080/actuator/health/readiness | grep -q '\"status\":\"UP\"'"
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+
+volumes:
+  eventmesh-postgres:
