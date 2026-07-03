@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: eventmesh
+  datasource:
+    url: ${EVENTMESH_DB_URL:jdbc:postgresql://localhost:5433/eventmesh}
+    username: ${EVENTMESH_DB_USERNAME:eventmesh}
+    password: ${EVENTMESH_DB_PASSWORD:eventmesh}
+    hikari:
+      maximum-pool-size: ${EVENTMESH_DB_POOL_SIZE:10}
+      connection-timeout: 3000
+  flyway:
+    locations: classpath:db/migration
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+  error:
+    include-message: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: EventMesh
+    delivery-gate: D1-durable-ingress
