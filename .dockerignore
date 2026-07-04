@@ -1,0 +1,10 @@
+.git
+.github
+.idea
+.vscode
+docs
+target
+*.md
+compose*.yml
+Dockerfile.local
+
