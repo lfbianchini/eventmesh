@@ -3,4 +3,7 @@ spring:
     locations:
       - classpath:db/migration
       - classpath:db/devdata
-
+    # Local seed data is intentionally versioned above product migrations.
+    # This permits a long-lived development volume to receive later product
+    # migrations without weakening validation in non-local environments.
+    out-of-order: true

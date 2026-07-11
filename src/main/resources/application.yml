@@ -10,6 +10,18 @@ spring:
       connection-timeout: 3000
   flyway:
     locations: classpath:db/migration
+  kafka:
+    bootstrap-servers: ${EVENTMESH_KAFKA_BOOTSTRAP_SERVERS:localhost:19092}
+    admin:
+      fail-fast: false
+    producer:
+      acks: all
+      retries: 2147483647
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
   lifecycle:
     timeout-per-shutdown-phase: 20s
 
@@ -35,4 +47,16 @@ management:
 info:
   app:
     name: EventMesh
-    delivery-gate: D1-durable-ingress
+    delivery-gate: D2-transactional-outbox
+
+eventmesh:
+  kafka:
+    create-topics: ${EVENTMESH_KAFKA_CREATE_TOPICS:true}
+  outbox:
+    scheduling-enabled: ${EVENTMESH_OUTBOX_SCHEDULING_ENABLED:true}
+    batch-size: ${EVENTMESH_OUTBOX_BATCH_SIZE:50}
+    poll-interval: ${EVENTMESH_OUTBOX_POLL_INTERVAL:500ms}
+    lease-duration: ${EVENTMESH_OUTBOX_LEASE_DURATION:30s}
+    send-timeout: ${EVENTMESH_OUTBOX_SEND_TIMEOUT:10s}
+    retry-base-delay: ${EVENTMESH_OUTBOX_RETRY_BASE_DELAY:1s}
+    retry-max-delay: ${EVENTMESH_OUTBOX_RETRY_MAX_DELAY:1m}
