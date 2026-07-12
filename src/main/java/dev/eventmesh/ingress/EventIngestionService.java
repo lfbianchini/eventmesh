@@ -4,6 +4,7 @@ import dev.eventmesh.auth.TenantPrincipal;
 import dev.eventmesh.error.EventNotFoundException;
 import dev.eventmesh.error.IdempotencyConflictException;
 import dev.eventmesh.error.InvalidRequestException;
+import dev.eventmesh.publication.OutboxWriter;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.UUID;
@@ -17,12 +18,17 @@ public class EventIngestionService {
 
   private final EventIngestionRepository repository;
   private final CanonicalEventHasher eventHasher;
+  private final OutboxWriter outboxWriter;
   private final Clock clock;
 
   public EventIngestionService(
-      EventIngestionRepository repository, CanonicalEventHasher eventHasher, Clock clock) {
+      EventIngestionRepository repository,
+      CanonicalEventHasher eventHasher,
+      OutboxWriter outboxWriter,
+      Clock clock) {
     this.repository = repository;
     this.eventHasher = eventHasher;
+    this.outboxWriter = outboxWriter;
     this.clock = clock;
   }
 
@@ -38,6 +44,7 @@ public class EventIngestionService {
         repository.insertIfAbsent(
             eventId, tenant.id(), idempotencyKey, request, payloadHash, receivedAt);
     if (inserted.isPresent()) {
+      outboxWriter.enqueueAccepted(inserted.get());
       return new EventIngestionResult(inserted.get(), true);
     }
 
@@ -76,4 +83,3 @@ public class EventIngestionService {
     }
   }
 }
-
