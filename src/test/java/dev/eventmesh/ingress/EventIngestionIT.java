@@ -52,6 +52,8 @@ class EventIngestionIT {
     registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
     registry.add("spring.datasource.username", POSTGRES::getUsername);
     registry.add("spring.datasource.password", POSTGRES::getPassword);
+    registry.add("eventmesh.outbox.scheduling-enabled", () -> "false");
+    registry.add("eventmesh.kafka.create-topics", () -> "false");
   }
 
   @Autowired MockMvc mockMvc;
@@ -60,6 +62,7 @@ class EventIngestionIT {
 
   @BeforeEach
   void resetEventsAndCreateSecondTenant() {
+    jdbcTemplate.update("DELETE FROM outbox_messages");
     jdbcTemplate.update("DELETE FROM events");
     jdbcTemplate.update(
         """
@@ -133,6 +136,9 @@ class EventIngestionIT {
     assertThat(replayed.get("id").asText()).isEqualTo(first);
     assertThat(replayed.get("replayed").asBoolean()).isTrue();
     assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM events", Integer.class))
+        .isEqualTo(1);
+    assertThat(
+            jdbcTemplate.queryForObject("SELECT COUNT(*) FROM outbox_messages", Integer.class))
         .isEqualTo(1);
   }
 
