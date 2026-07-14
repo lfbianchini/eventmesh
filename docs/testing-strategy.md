@@ -29,8 +29,8 @@ test instead of a mocked repository test.
 
 ### Integration tests
 
-Testcontainers starts the same major PostgreSQL version used by Compose. D1
-integration tests cover:
+Testcontainers starts the same PostgreSQL and Kafka image versions used by
+Compose. Integration tests cover:
 
 - migrations from an empty database;
 - successful insertion and lookup;
@@ -40,8 +40,14 @@ integration tests cover:
 - cross-tenant isolation;
 - concurrent same-key requests.
 
-D2 will add a real Kafka-compatible container. D3 will add a deterministic fake
-HTTP subscriber.
+D2 also covers:
+
+- one outbox intent for an idempotent ingress replay;
+- stable message identity across a failed and recovered publisher;
+- the exact versioned envelope read from a real Kafka broker;
+- a paused Kafka container retaining pending work and publishing after recovery.
+
+D3 adds a deterministic fake HTTP subscriber.
 
 ### Container smoke tests
 
@@ -54,10 +60,15 @@ The public `Dockerfile` performs a hermetic multi-stage build. The local
 base, allowing development behind a TLS-inspecting network without committing a
 private certificate or weakening Maven TLS verification.
 
+The local seed is a `V1000` migration loaded only by the `local` profile. That
+profile enables Flyway out-of-order execution so an existing development volume
+can still receive later product migrations such as `V2` and `V3`. Production
+loads only `db/migration` and retains strict ordering.
+
 ### Failure tests
 
-Beginning in D2, scripts will terminate dependencies or workers at controlled
-points and assert eventual recovery. Each scenario records:
+Beginning in D2, tests terminate or pause dependencies at controlled points and
+assert eventual recovery. Each scenario records:
 
 - initial state;
 - injected failure;

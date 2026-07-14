@@ -14,13 +14,15 @@ deliverables. Each delivery gate must have:
 
 ## Delivery status
 
-**Complete:** D0 repository foundation and D1 durable ingress  
-**Next:** D2 transactional outbox and Kafka publication
+**Complete:** D0 foundation, D1 durable ingress, and D2 transactional outbox
+
+**Next:** D3 signed webhook delivery, retry, dead-letter handling, and replay
 
 The current implementation accepts tenant-authenticated events, persists them in
-PostgreSQL, and provides atomic idempotency semantics. Kafka publication,
-webhook delivery, retries, and Kubernetes are intentionally later deliverables.
-See [the delivery plan](docs/delivery-plan.md).
+PostgreSQL with atomic idempotency semantics, and publishes versioned messages
+through a transactional outbox to Kafka. Webhook delivery, retries, and
+Kubernetes are intentionally later deliverables. See
+[the delivery plan](docs/delivery-plan.md).
 
 ## Why this shape?
 
@@ -94,9 +96,10 @@ tenant. It must never be reused outside local development.
 ./scripts/verify.sh
 ```
 
-The verification suite includes unit tests, PostgreSQL integration tests through
-Testcontainers, API behavior tests, and a coverage gate. The script discovers
-the active Docker context, including Rancher Desktop and Docker Desktop.
+The verification suite includes unit tests, PostgreSQL and Kafka integration
+tests through Testcontainers, a real broker pause/recovery scenario, API
+behavior tests, and a coverage gate. The script discovers the active Docker
+context, including Rancher Desktop and Docker Desktop.
 
 ## Documentation map
 

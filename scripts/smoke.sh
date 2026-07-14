@@ -13,7 +13,7 @@ curl --fail --silent --show-error \
   --request POST "$base_url/v1/events" \
   --header 'Content-Type: application/json' \
   --header "X-EventMesh-Key: $api_key" \
-  --header 'Idempotency-Key: smoke-order-123' \
+  --header 'Idempotency-Key: smoke-d2-order-123' \
   --data '{
     "type": "order.created",
     "source": "smoke.test",
