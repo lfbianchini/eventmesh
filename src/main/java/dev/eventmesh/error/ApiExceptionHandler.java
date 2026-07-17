@@ -66,6 +66,39 @@ public class ApiExceptionHandler {
         null);
   }
 
+  @ExceptionHandler(SubscriptionNotFoundException.class)
+  ResponseEntity<ProblemDetail> handleSubscriptionNotFound(
+      SubscriptionNotFoundException exception, HttpServletRequest request) {
+    return problem(
+        HttpStatus.NOT_FOUND,
+        "SUBSCRIPTION_NOT_FOUND",
+        exception.getMessage(),
+        request.getRequestURI(),
+        null);
+  }
+
+  @ExceptionHandler(SubscriptionConflictException.class)
+  ResponseEntity<ProblemDetail> handleSubscriptionConflict(
+      SubscriptionConflictException exception, HttpServletRequest request) {
+    return problem(
+        HttpStatus.CONFLICT,
+        "SUBSCRIPTION_CONFLICT",
+        exception.getMessage(),
+        request.getRequestURI(),
+        null);
+  }
+
+  @ExceptionHandler(DeliveryNotFoundException.class)
+  ResponseEntity<ProblemDetail> handleDeliveryNotFound(
+      DeliveryNotFoundException exception, HttpServletRequest request) {
+    return problem(
+        HttpStatus.NOT_FOUND,
+        "DELIVERY_NOT_FOUND",
+        exception.getMessage(),
+        request.getRequestURI(),
+        null);
+  }
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   ResponseEntity<ProblemDetail> handleValidation(
       MethodArgumentNotValidException exception, HttpServletRequest request) {
