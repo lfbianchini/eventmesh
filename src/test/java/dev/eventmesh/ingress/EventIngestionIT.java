@@ -54,6 +54,8 @@ class EventIngestionIT {
     registry.add("spring.datasource.password", POSTGRES::getPassword);
     registry.add("eventmesh.outbox.scheduling-enabled", () -> "false");
     registry.add("eventmesh.kafka.create-topics", () -> "false");
+    registry.add("eventmesh.webhooks.kafka-listener-enabled", () -> "false");
+    registry.add("eventmesh.webhooks.scheduling-enabled", () -> "false");
   }
 
   @Autowired MockMvc mockMvc;

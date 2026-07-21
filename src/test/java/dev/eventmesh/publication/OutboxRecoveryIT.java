@@ -31,7 +31,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest(
     properties = {
       "eventmesh.outbox.scheduling-enabled=false",
-      "eventmesh.kafka.create-topics=false"
+      "eventmesh.kafka.create-topics=false",
+      "eventmesh.webhooks.kafka-listener-enabled=false",
+      "eventmesh.webhooks.scheduling-enabled=false"
     })
 @AutoConfigureMockMvc
 @ActiveProfiles("local")

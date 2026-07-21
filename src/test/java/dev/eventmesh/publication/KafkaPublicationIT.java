@@ -36,7 +36,9 @@ import org.testcontainers.kafka.KafkaContainer;
       "eventmesh.outbox.send-timeout=1s",
       "spring.kafka.producer.properties.max.block.ms=1000",
       "spring.kafka.producer.properties.request.timeout.ms=1000",
-      "spring.kafka.producer.properties.delivery.timeout.ms=3000"
+      "spring.kafka.producer.properties.delivery.timeout.ms=3000",
+      "eventmesh.webhooks.kafka-listener-enabled=false",
+      "eventmesh.webhooks.scheduling-enabled=false"
     })
 @AutoConfigureMockMvc
 @ActiveProfiles("local")
