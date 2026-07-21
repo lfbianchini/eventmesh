@@ -22,6 +22,13 @@ spring:
       properties:
         enable.idempotence: true
         max.in.flight.requests.per.connection: 5
+    consumer:
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      ack-mode: record
   lifecycle:
     timeout-per-shutdown-phase: 20s
 
@@ -47,9 +54,11 @@ management:
 info:
   app:
     name: EventMesh
-    delivery-gate: D2-transactional-outbox
+    delivery-gate: D3-signed-webhook-delivery
 
 eventmesh:
+  security:
+    encryption-key: ${EVENTMESH_SECRET_ENCRYPTION_KEY:}
   kafka:
     create-topics: ${EVENTMESH_KAFKA_CREATE_TOPICS:true}
   outbox:
@@ -60,3 +69,15 @@ eventmesh:
     send-timeout: ${EVENTMESH_OUTBOX_SEND_TIMEOUT:10s}
     retry-base-delay: ${EVENTMESH_OUTBOX_RETRY_BASE_DELAY:1s}
     retry-max-delay: ${EVENTMESH_OUTBOX_RETRY_MAX_DELAY:1m}
+  webhooks:
+    kafka-listener-enabled: ${EVENTMESH_WEBHOOK_KAFKA_LISTENER_ENABLED:true}
+    scheduling-enabled: ${EVENTMESH_WEBHOOK_SCHEDULING_ENABLED:true}
+    allow-private-endpoints: ${EVENTMESH_ALLOW_PRIVATE_WEBHOOK_ENDPOINTS:false}
+    batch-size: ${EVENTMESH_WEBHOOK_BATCH_SIZE:25}
+    max-attempts: ${EVENTMESH_WEBHOOK_MAX_ATTEMPTS:5}
+    poll-interval: ${EVENTMESH_WEBHOOK_POLL_INTERVAL:500ms}
+    lease-duration: ${EVENTMESH_WEBHOOK_LEASE_DURATION:30s}
+    connect-timeout: ${EVENTMESH_WEBHOOK_CONNECT_TIMEOUT:3s}
+    request-timeout: ${EVENTMESH_WEBHOOK_REQUEST_TIMEOUT:5s}
+    retry-base-delay: ${EVENTMESH_WEBHOOK_RETRY_BASE_DELAY:1s}
+    retry-max-delay: ${EVENTMESH_WEBHOOK_RETRY_MAX_DELAY:5m}

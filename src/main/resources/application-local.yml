@@ -7,3 +7,10 @@ spring:
     # This permits a long-lived development volume to receive later product
     # migrations without weakening validation in non-local environments.
     out-of-order: true
+
+eventmesh:
+  security:
+    # Public development-only key. Production must inject a unique 256-bit key.
+    encryption-key: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  webhooks:
+    allow-private-endpoints: true

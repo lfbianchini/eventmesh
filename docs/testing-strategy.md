@@ -49,6 +49,17 @@ D2 also covers:
 
 D3 adds a deterministic fake HTTP subscriber.
 
+D3 coverage includes:
+
+- encrypted-secret create/read behavior;
+- subscription event-type filtering;
+- repeated accepted-message fan-out producing one initial delivery;
+- exact HMAC verification by an independent HTTP handler;
+- `500 → 429 → 204` retry and success history;
+- permanent `400` dead-lettering;
+- replay as a new delivery while the original remains unchanged;
+- public-mode SSRF URL rejection.
+
 ### Container smoke tests
 
 Build the production image, start it through Compose, wait for readiness, and
@@ -89,6 +100,14 @@ D4 k6 tests will publish:
 - error rate.
 
 Benchmark results are not regression tests unless the environment is controlled.
+
+### Compose demonstration
+
+`./scripts/demo.sh` adds the profile-scoped Python subscriber to the normal
+PostgreSQL/Kafka/application stack. The subscriber deliberately fails twice,
+verifies signature freshness and bytes independently, and exposes the received
+attempts. This is a human-readable system proof, not a substitute for the
+deterministic integration suite.
 
 ## CI gate
 

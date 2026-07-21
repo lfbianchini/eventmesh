@@ -14,15 +14,16 @@ deliverables. Each delivery gate must have:
 
 ## Delivery status
 
-**Complete:** D0 foundation, D1 durable ingress, and D2 transactional outbox
+**Complete:** D0 foundation through D3 signed webhook delivery
 
-**Next:** D3 signed webhook delivery, retry, dead-letter handling, and replay
+**Next:** D4 operational evidence and portable deployment
 
 The current implementation accepts tenant-authenticated events, persists them in
 PostgreSQL with atomic idempotency semantics, and publishes versioned messages
-through a transactional outbox to Kafka. Webhook delivery, retries, and
-Kubernetes are intentionally later deliverables. See
-[the delivery plan](docs/delivery-plan.md).
+through a transactional outbox to Kafka. Matching subscriptions receive
+HMAC-signed webhooks with inspectable retries, immutable attempt history,
+dead-letter state, and operator replay. Observability packaging and Kubernetes
+are intentionally D4. See [the delivery plan](docs/delivery-plan.md).
 
 ## Why this shape?
 
@@ -100,6 +101,17 @@ The verification suite includes unit tests, PostgreSQL and Kafka integration
 tests through Testcontainers, a real broker pause/recovery scenario, API
 behavior tests, and a coverage gate. The script discovers the active Docker
 context, including Rancher Desktop and Docker Desktop.
+
+## Run the failure/recovery demo
+
+```bash
+./scripts/demo.sh
+```
+
+The script starts a separate subscriber container, configures it to return two
+planned `503` responses, registers a subscription, submits an event, and waits
+for delivery to succeed. Its final JSON shows three attempts with the same
+delivery ID and a valid signature on every request.
 
 ## Documentation map
 
