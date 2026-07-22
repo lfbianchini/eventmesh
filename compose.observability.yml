@@ -1,0 +1,70 @@
+services:
+  eventmesh:
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      EVENTMESH_TRACING_ENABLED: "true"
+      EVENTMESH_TRACE_SAMPLING_PROBABILITY: "1.0"
+      EVENTMESH_OTLP_TRACING_ENDPOINT: http://otel-collector:4318/v1/traces
+      EVENTMESH_ENVIRONMENT: compose
+    depends_on:
+      otel-collector:
+        condition: service_started
+
+  prometheus:
+    profiles: ["observability"]
+    image: prom/prometheus:v3.13.0
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - eventmesh-prometheus:/prometheus
+    ports:
+      - "${EVENTMESH_PROMETHEUS_PORT:-9090}:9090"
+    depends_on:
+      eventmesh:
+        condition: service_healthy
+
+  tempo:
+    profiles: ["observability"]
+    image: grafana/tempo:2.10.5
+    command: ["-config.file=/etc/tempo.yml"]
+    volumes:
+      - ./observability/tempo/tempo.yml:/etc/tempo.yml:ro
+      - eventmesh-tempo:/var/tempo
+    ports:
+      - "${EVENTMESH_TEMPO_PORT:-3200}:3200"
+
+  otel-collector:
+    profiles: ["observability"]
+    image: otel/opentelemetry-collector-contrib:0.153.0
+    command: ["--config=/etc/otelcol/config.yml"]
+    volumes:
+      - ./observability/otel-collector/config.yml:/etc/otelcol/config.yml:ro
+    depends_on:
+      tempo:
+        condition: service_started
+
+  grafana:
+    profiles: ["observability"]
+    image: grafana/grafana:13.1.0
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - eventmesh-grafana:/var/lib/grafana
+    ports:
+      - "${EVENTMESH_GRAFANA_PORT:-3000}:3000"
+    depends_on:
+      prometheus:
+        condition: service_started
+      tempo:
+        condition: service_started
+
+volumes:
+  eventmesh-prometheus:
+  eventmesh-tempo:
+  eventmesh-grafana:
