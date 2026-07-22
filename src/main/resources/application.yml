@@ -42,11 +42,31 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus
   endpoint:
     health:
       probes:
         enabled: true
+    prometheus:
+      access: read-only
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  tracing:
+    enabled: ${EVENTMESH_TRACING_ENABLED:false}
+    sampling:
+      probability: ${EVENTMESH_TRACE_SAMPLING_PROBABILITY:0.1}
+  otlp:
+    tracing:
+      endpoint: ${EVENTMESH_OTLP_TRACING_ENDPOINT:http://localhost:4318/v1/traces}
+  opentelemetry:
+    resource-attributes:
+      service.name: ${spring.application.name}
+      deployment.environment: ${EVENTMESH_ENVIRONMENT:local}
   info:
     env:
       enabled: true
@@ -54,9 +74,12 @@ management:
 info:
   app:
     name: EventMesh
-    delivery-gate: D3-signed-webhook-delivery
+    delivery-gate: D4-operational-evidence
 
 eventmesh:
+  observability:
+    scheduling-enabled: ${EVENTMESH_METRICS_SCHEDULING_ENABLED:true}
+    snapshot-interval: ${EVENTMESH_METRICS_SNAPSHOT_INTERVAL:5s}
   security:
     encryption-key: ${EVENTMESH_SECRET_ENCRYPTION_KEY:}
   kafka:
