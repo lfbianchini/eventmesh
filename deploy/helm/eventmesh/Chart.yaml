@@ -1,0 +1,6 @@
+apiVersion: v2
+name: eventmesh
+description: Portable deployment chart for the EventMesh API and workers
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
