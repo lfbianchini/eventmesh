@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "eventmesh.fullname" . }}
+  labels:
+    {{- include "eventmesh.labels" . | nindent 4 }}
+data:
+  EVENTMESH_DB_URL: {{ .Values.config.databaseUrl | quote }}
+  EVENTMESH_DB_USERNAME: {{ .Values.config.databaseUsername | quote }}
+  EVENTMESH_KAFKA_BOOTSTRAP_SERVERS: {{ .Values.config.kafkaBootstrapServers | quote }}
+  EVENTMESH_ENVIRONMENT: {{ .Values.config.environment | quote }}
+  EVENTMESH_TRACING_ENABLED: {{ .Values.config.tracingEnabled | quote }}
+  EVENTMESH_TRACE_SAMPLING_PROBABILITY: {{ .Values.config.traceSamplingProbability | quote }}
+  EVENTMESH_OTLP_TRACING_ENDPOINT: {{ .Values.config.otlpTracingEndpoint | quote }}
+  {{- if .Values.config.springProfilesActive }}
+  SPRING_PROFILES_ACTIVE: {{ .Values.config.springProfilesActive | quote }}
+  {{- end }}

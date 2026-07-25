@@ -1,0 +1,39 @@
+replicaCount: 1
+
+image:
+  repository: eventmesh
+  tag: local
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+config:
+  springProfilesActive: ""
+  databaseUrl: jdbc:postgresql://postgres:5432/eventmesh
+  databaseUsername: eventmesh
+  kafkaBootstrapServers: kafka:9092
+  environment: kubernetes
+  tracingEnabled: "false"
+  traceSamplingProbability: "0.1"
+  otlpTracingEndpoint: http://otel-collector:4318/v1/traces
+
+secrets:
+  create: false
+  existingSecret: eventmesh-secrets
+  databasePassword: ""
+  encryptionKey: ""
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 768Mi
+
+podAnnotations: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
