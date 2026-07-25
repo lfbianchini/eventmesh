@@ -1,0 +1,19 @@
+image:
+  repository: eventmesh
+  tag: local
+  pullPolicy: IfNotPresent
+
+config:
+  springProfilesActive: local
+  databaseUrl: jdbc:postgresql://postgres:5432/eventmesh
+  databaseUsername: eventmesh
+  kafkaBootstrapServers: kafka:9092
+  environment: kind
+  tracingEnabled: "false"
+
+secrets:
+  create: true
+  existingSecret: eventmesh-secrets
+  databasePassword: eventmesh
+  # Public development-only AES-256 key; never reuse outside local testing.
+  encryptionKey: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
