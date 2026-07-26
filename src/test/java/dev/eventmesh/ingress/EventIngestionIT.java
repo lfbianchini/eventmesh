@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.eventmesh.auth.ApiKeyHasher;
+import dev.eventmesh.observability.OperationalMetrics;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -56,11 +57,13 @@ class EventIngestionIT {
     registry.add("eventmesh.kafka.create-topics", () -> "false");
     registry.add("eventmesh.webhooks.kafka-listener-enabled", () -> "false");
     registry.add("eventmesh.webhooks.scheduling-enabled", () -> "false");
+    registry.add("eventmesh.observability.scheduling-enabled", () -> "false");
   }
 
   @Autowired MockMvc mockMvc;
   @Autowired ObjectMapper objectMapper;
   @Autowired JdbcTemplate jdbcTemplate;
+  @Autowired OperationalMetrics operationalMetrics;
 
   @BeforeEach
   void resetEventsAndCreateSecondTenant() {
@@ -115,6 +118,24 @@ class EventIngestionIT {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(eventId))
         .andExpect(jsonPath("$.subject").value("order-123"));
+  }
+
+  @Test
+  void exposesDurableStateAsPrometheusMetrics() throws Exception {
+    postEvent(LOCAL_API_KEY, "metrics-event-1", validEventJson(4200), 201);
+    operationalMetrics.refresh();
+
+    var metrics =
+        mockMvc
+            .perform(get("/actuator/prometheus"))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    assertThat(metrics).contains("eventmesh_state_events");
+    assertThat(metrics).contains("eventmesh_state_outbox");
+    assertThat(metrics).contains("status=\"pending\"");
   }
 
   @Test

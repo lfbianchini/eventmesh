@@ -46,6 +46,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
       "eventmesh.kafka.create-topics=false",
       "eventmesh.webhooks.kafka-listener-enabled=false",
       "eventmesh.webhooks.scheduling-enabled=false",
+      "eventmesh.observability.scheduling-enabled=false",
       "eventmesh.webhooks.max-attempts=3",
       "eventmesh.webhooks.retry-base-delay=10ms",
       "eventmesh.webhooks.retry-max-delay=100ms"
