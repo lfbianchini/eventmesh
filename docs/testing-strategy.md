@@ -87,9 +87,16 @@ assert eventual recovery. Each scenario records:
 - maximum observation window;
 - final state.
 
+D4 makes the drills executable:
+
+- `failure-broker.sh` pauses Kafka, confirms an unpublished durable outbox row,
+  unpauses Kafka, and measures recovery;
+- `failure-worker-restart.sh` forces a retry, terminates the application,
+  restores the subscriber, and measures completion after restart.
+
 ### Benchmarks
 
-D4 k6 tests will publish:
+D4 k6 tests publish:
 
 - commit SHA;
 - hardware/container resource limits;
@@ -100,6 +107,20 @@ D4 k6 tests will publish:
 - error rate.
 
 Benchmark results are not regression tests unless the environment is controlled.
+The benchmark contract and reviewed local run are documented in
+[benchmarks.md](benchmarks.md) and
+[the D4 evidence report](evidence/d4-local-2026-07-29.md).
+
+### Observability and deployment tests
+
+D4 adds:
+
+- an integration assertion against the real Prometheus Actuator endpoint;
+- Compose configuration validation and live Prometheus target checks;
+- provisioned Grafana dashboard discovery;
+- Tempo trace search after an observed HTTP request;
+- Helm lint and render validation;
+- a Kind smoke test using the same image as Compose.
 
 ### Compose demonstration
 

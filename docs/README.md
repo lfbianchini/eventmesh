@@ -12,12 +12,17 @@ implementation details without reverse-engineering the codebase.
 5. [D2 outbox publication](outbox-publication.md) — message and recovery contract.
 6. [D3 webhook delivery](webhook-delivery.md) — API, signing, retry, and replay.
 7. [D3 data model](data-model.md) — schema, constraints, and indexes.
-8. [Reliability model](reliability-model.md) — what is and is not guaranteed.
-9. [Platform portability](platform-portability.md) — cloud-neutral constraints.
-10. [Security model](security-model.md) — threat boundaries and key handling.
-11. [Testing strategy](testing-strategy.md) — evidence at each test layer.
-12. [Interview guide](interview-guide.md) — concise explanations and tradeoffs.
-13. [Architecture decision records](adrs/README.md) — decisions and alternatives.
+8. [D4 observability](observability.md) — metrics, dashboard, and traces.
+9. [D4 operations runbook](runbook.md) — diagnosis and recovery.
+10. [D4 benchmark methodology](benchmarks.md) — scope and interpretation.
+11. [D4 Kubernetes/Helm](kubernetes.md) — portable deployment contract.
+12. [D4 measured evidence](evidence/d4-local-2026-07-29.md) — bounded local results.
+13. [Reliability model](reliability-model.md) — what is and is not guaranteed.
+14. [Platform portability](platform-portability.md) — cloud-neutral constraints.
+15. [Security model](security-model.md) — threat boundaries and key handling.
+16. [Testing strategy](testing-strategy.md) — evidence at each test layer.
+17. [Interview guide](interview-guide.md) — concise explanations and tradeoffs.
+18. [Architecture decision records](adrs/README.md) — decisions and alternatives.
 
 ## Documentation rules
 

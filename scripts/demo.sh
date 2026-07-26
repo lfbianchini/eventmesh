@@ -6,7 +6,9 @@ base_url="${EVENTMESH_BASE_URL:-http://localhost:8088}"
 subscriber_url="${EVENTMESH_SUBSCRIBER_URL:-http://127.0.0.1:8090}"
 api_key="${EVENTMESH_DEV_API_KEY:-em_dev_local_key_change_me}"
 signing_secret="eventmesh-demo-signing-secret-change-me-32"
+planned_failures="${EVENTMESH_DEMO_FAILURES:-2}"
 run_id="$(date +%s)-$$"
+started_at_ms="$(python3 -c 'import time; print(time.time_ns() // 1_000_000)')"
 
 ./scripts/dev-up.sh
 docker compose -f compose.yml -f compose.local.yml --profile demo \
@@ -26,7 +28,7 @@ if [ "$subscriber_ready" != "true" ]; then
 fi
 
 curl --fail --silent --show-error \
-  --request POST "$subscriber_url/reset?failures=2" >/dev/null
+  --request POST "$subscriber_url/reset?failures=$planned_failures" >/dev/null
 
 curl --fail --silent --show-error \
   --request POST "$base_url/v1/subscriptions" \
@@ -68,7 +70,10 @@ while [ "$attempt" -lt 80 ]; do
   )"
   if printf '%s' "$deliveries" |
     grep -q "\"eventId\":\"$event_id\".*\"status\":\"SUCCEEDED\""; then
-    echo "Event $event_id reached SUCCEEDED after planned 503 retries."
+    finished_at_ms="$(python3 -c 'import time; print(time.time_ns() // 1_000_000)')"
+    recovery_ms=$((finished_at_ms - started_at_ms))
+    echo "Event $event_id reached SUCCEEDED after $planned_failures planned 503 responses."
+    echo "Subscriber recovery measurement: ${recovery_ms}ms end to end."
     curl --fail --silent --show-error "$subscriber_url/requests"
     printf '\n'
     exit 0

@@ -14,16 +14,17 @@ deliverables. Each delivery gate must have:
 
 ## Delivery status
 
-**Complete:** D0 foundation through D3 signed webhook delivery
+**Complete:** D0 foundation through D4 operational evidence
 
-**Next:** D4 operational evidence and portable deployment
+**Next:** D5 portfolio presentation
 
 The current implementation accepts tenant-authenticated events, persists them in
 PostgreSQL with atomic idempotency semantics, and publishes versioned messages
 through a transactional outbox to Kafka. Matching subscriptions receive
 HMAC-signed webhooks with inspectable retries, immutable attempt history,
 dead-letter state, and operator replay. Observability packaging and Kubernetes
-are intentionally D4. See [the delivery plan](docs/delivery-plan.md).
+are implemented through Prometheus, Grafana, OpenTelemetry/Tempo, and Helm. See
+[the delivery plan](docs/delivery-plan.md).
 
 ## Why this shape?
 
@@ -112,6 +113,32 @@ The script starts a separate subscriber container, configures it to return two
 planned `503` responses, registers a subscription, submits an event, and waits
 for delivery to succeed. Its final JSON shows three attempts with the same
 delivery ID and a valid signature on every request.
+
+## Observe and break it safely
+
+```bash
+./scripts/observability-up.sh
+./scripts/failure-broker.sh
+./scripts/failure-worker-restart.sh
+```
+
+The first command provisions the operations dashboard, Prometheus, an
+OpenTelemetry Collector, and Tempo. The failure drills verify that database
+state survives a paused broker and a terminated worker, and print a new recovery
+measurement on every run.
+
+## Benchmark and Kubernetes proof
+
+```bash
+./scripts/benchmark.sh
+./scripts/kind-smoke.sh
+```
+
+The benchmark measures durable ingress only and writes a raw k6 summary under
+`reports/`. The Kind smoke test loads the same local OCI image, installs the
+application-only Helm chart, waits for readiness, and submits an authenticated
+event. See [the reviewed local evidence](docs/evidence/d4-local-2026-07-29.md)
+for measured results and limitations.
 
 ## Documentation map
 
