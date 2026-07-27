@@ -38,6 +38,15 @@ server:
   error:
     include-message: never
 
+springdoc:
+  api-docs:
+    enabled: ${EVENTMESH_API_DOCS_ENABLED:true}
+  swagger-ui:
+    enabled: ${EVENTMESH_API_DOCS_ENABLED:true}
+    operations-sorter: method
+    tags-sorter: alpha
+    try-it-out-enabled: true
+
 management:
   endpoints:
     web:
@@ -74,7 +83,7 @@ management:
 info:
   app:
     name: EventMesh
-    delivery-gate: D4-operational-evidence
+    delivery-gate: D5-portfolio-complete
 
 eventmesh:
   observability:
