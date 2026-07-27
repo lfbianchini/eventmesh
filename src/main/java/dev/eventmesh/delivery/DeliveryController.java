@@ -1,6 +1,8 @@
 package dev.eventmesh.delivery;
 
 import dev.eventmesh.auth.TenantAuthenticator;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/deliveries")
+@Tag(name = "Deliveries", description = "Webhook state, immutable attempts, and replay")
 public class DeliveryController {
 
   private static final String API_KEY_HEADER = "X-EventMesh-Key";
@@ -27,12 +30,14 @@ public class DeliveryController {
   }
 
   @GetMapping
+  @Operation(summary = "List the tenant's latest webhook deliveries")
   List<DeliverySummary> list(
       @RequestHeader(value = API_KEY_HEADER, required = false) String apiKey) {
     return service.list(tenantAuthenticator.requireTenant(apiKey));
   }
 
   @GetMapping("/{deliveryId}")
+  @Operation(summary = "Inspect a delivery and its immutable attempt history")
   DeliveryDetails get(
       @RequestHeader(value = API_KEY_HEADER, required = false) String apiKey,
       @PathVariable UUID deliveryId) {
@@ -40,6 +45,7 @@ public class DeliveryController {
   }
 
   @PostMapping("/{deliveryId}/replay")
+  @Operation(summary = "Create a linked replay of a dead-letter delivery")
   ResponseEntity<DeliverySummary> replay(
       @RequestHeader(value = API_KEY_HEADER, required = false) String apiKey,
       @PathVariable UUID deliveryId) {

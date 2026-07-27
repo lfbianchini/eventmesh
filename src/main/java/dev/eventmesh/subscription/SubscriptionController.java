@@ -1,6 +1,8 @@
 package dev.eventmesh.subscription;
 
 import dev.eventmesh.auth.TenantAuthenticator;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/subscriptions")
+@Tag(name = "Subscriptions", description = "Exact-match webhook routing and signing secrets")
 public class SubscriptionController {
 
   private static final String API_KEY_HEADER = "X-EventMesh-Key";
@@ -30,6 +33,7 @@ public class SubscriptionController {
   }
 
   @PostMapping
+  @Operation(summary = "Register a webhook subscription")
   ResponseEntity<SubscriptionResponse> create(
       @RequestHeader(value = API_KEY_HEADER, required = false) String apiKey,
       @Valid @RequestBody CreateSubscriptionRequest request) {
@@ -41,6 +45,7 @@ public class SubscriptionController {
   }
 
   @GetMapping
+  @Operation(summary = "List the tenant's webhook subscriptions")
   List<SubscriptionResponse> list(
       @RequestHeader(value = API_KEY_HEADER, required = false) String apiKey) {
     var tenant = tenantAuthenticator.requireTenant(apiKey);
@@ -50,6 +55,7 @@ public class SubscriptionController {
   }
 
   @GetMapping("/{subscriptionId}")
+  @Operation(summary = "Get one tenant-visible webhook subscription")
   SubscriptionResponse get(
       @RequestHeader(value = API_KEY_HEADER, required = false) String apiKey,
       @PathVariable UUID subscriptionId) {

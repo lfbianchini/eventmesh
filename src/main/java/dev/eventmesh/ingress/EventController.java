@@ -1,6 +1,8 @@
 package dev.eventmesh.ingress;
 
 import dev.eventmesh.auth.TenantAuthenticator;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.UUID;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/events")
+@Tag(name = "Events", description = "Durable, tenant-scoped event ingestion and lookup")
 public class EventController {
 
   static final String API_KEY_HEADER = "X-EventMesh-Key";
@@ -30,6 +33,7 @@ public class EventController {
   }
 
   @PostMapping
+  @Operation(summary = "Accept an event with tenant-scoped idempotency")
   ResponseEntity<EventResponse> ingest(
       @RequestHeader(value = API_KEY_HEADER, required = false) String apiKey,
       @RequestHeader(value = IDEMPOTENCY_KEY_HEADER, required = false) String idempotencyKey,
@@ -45,6 +49,7 @@ public class EventController {
   }
 
   @GetMapping("/{eventId}")
+  @Operation(summary = "Get an event visible to the authenticated tenant")
   EventResponse get(
       @RequestHeader(value = API_KEY_HEADER, required = false) String apiKey,
       @PathVariable UUID eventId) {
@@ -52,4 +57,3 @@ public class EventController {
     return EventResponse.from(eventIngestionService.get(tenant, eventId), false);
   }
 }
-
