@@ -1,0 +1,33 @@
+name: Feature request
+description: Propose a scoped capability with a testable outcome
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user or operator problem is not solved today?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Observable outcome
+      description: Describe the smallest externally visible result.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance evidence
+      description: What automated test or failure scenario would prove completion?
+    validations:
+      required: true
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Tradeoffs and alternatives
+      description: What complexity does this add, and what smaller alternatives exist?
+    validations:
+      required: true
