@@ -66,15 +66,17 @@ class Handler(BaseHTTPRequestHandler):
             event = {"invalidJson": True}
 
         with lock:
+            should_fail = remaining_failures > 0
+            response_status = 401 if not valid else (503 if should_fail else 204)
             requests.append(
                 {
                     "deliveryId": delivery_id,
                     "attempt": int(self.headers.get("X-EventMesh-Attempt", "0")),
                     "validSignature": valid,
+                    "responseStatus": response_status,
                     "event": event,
                 }
             )
-            should_fail = remaining_failures > 0
             if should_fail:
                 remaining_failures -= 1
 
