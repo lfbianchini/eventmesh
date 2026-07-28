@@ -16,6 +16,7 @@ config:
   kafkaBootstrapServers: kafka:9092
   environment: kubernetes
   tracingEnabled: "false"
+  apiDocsEnabled: "false"
   traceSamplingProbability: "0.1"
   otlpTracingEndpoint: http://otel-collector:4318/v1/traces
 

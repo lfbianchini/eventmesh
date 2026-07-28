@@ -10,6 +10,7 @@ config:
   kafkaBootstrapServers: kafka:9092
   environment: kind
   tracingEnabled: "false"
+  apiDocsEnabled: "true"
 
 secrets:
   create: true

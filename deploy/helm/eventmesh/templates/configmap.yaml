@@ -10,6 +10,7 @@ data:
   EVENTMESH_KAFKA_BOOTSTRAP_SERVERS: {{ .Values.config.kafkaBootstrapServers | quote }}
   EVENTMESH_ENVIRONMENT: {{ .Values.config.environment | quote }}
   EVENTMESH_TRACING_ENABLED: {{ .Values.config.tracingEnabled | quote }}
+  EVENTMESH_API_DOCS_ENABLED: {{ .Values.config.apiDocsEnabled | quote }}
   EVENTMESH_TRACE_SAMPLING_PROBABILITY: {{ .Values.config.traceSamplingProbability | quote }}
   EVENTMESH_OTLP_TRACING_ENDPOINT: {{ .Values.config.otlpTracingEndpoint | quote }}
   {{- if .Values.config.springProfilesActive }}
