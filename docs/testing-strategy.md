@@ -103,7 +103,7 @@ D4 k6 tests publish:
 - dataset and concurrency;
 - warm-up and measurement duration;
 - p50/p95/p99 latency;
-- accepted/delivered throughput;
+- accepted throughput and resulting durable backlog;
 - error rate.
 
 Benchmark results are not regression tests unless the environment is controlled.
@@ -122,19 +122,30 @@ D4 adds:
 - Helm lint and render validation;
 - a Kind smoke test using the same image as Compose.
 
+D5 adds:
+
+- an integration assertion for the generated OpenAPI title, headline paths, and
+  API-key security scheme;
+- CI validation of all Compose overlays and the Helm chart;
+- a self-checking public-API demonstration whose output is also the source of
+  the repository walkthrough.
+
 ### Compose demonstration
 
 `./scripts/demo.sh` adds the profile-scoped Python subscriber to the normal
 PostgreSQL/Kafka/application stack. The subscriber deliberately fails twice,
 verifies signature freshness and bytes independently, and exposes the received
-attempts. This is a human-readable system proof, not a substitute for the
-deterministic integration suite.
+attempts. The script asserts the attempt count, signature verdicts, stable
+delivery identity, and final success before exiting zero. This is a
+human-readable system proof, not a substitute for the deterministic integration
+suite.
 
 ## CI gate
 
 `./scripts/verify.sh` is the authoritative local code gate. It selects Java 21
 from Homebrew when necessary and exposes the active Docker context to
 Testcontainers. CI invokes the underlying `./mvnw verify` command in its
-standard Docker environment. GitHub Actions additionally builds the OCI image.
+standard Docker environment. GitHub Actions additionally validates Compose and
+Helm packaging, builds the OCI image, and uploads test and coverage artifacts.
 A green test badge is useful only if the commands also work from a clean local
 checkout.

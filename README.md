@@ -1,79 +1,78 @@
 # EventMesh
 
-EventMesh is a multi-tenant event ingestion and webhook delivery platform built
-to demonstrate reliable backend engineering under real failure modes.
+**A multi-tenant event ingestion and signed-webhook delivery platform that makes
+failure behavior visible and testable.**
 
-The project is developed as a sequence of small, independently reviewable
-deliverables. Each delivery gate must have:
+EventMesh accepts idempotent events, commits each event and its Kafka publication
+intent in one PostgreSQL transaction, then delivers matching webhooks with
+HMAC signatures, retry history, dead-letter state, and replay. It is a Java 21
+modular monolith packaged for Docker Compose and Kubernetes without a cloud SDK.
 
-- a narrow behavioral contract;
-- automated tests;
-- a one-command local path;
-- an explicit design decision record;
-- evidence before any performance or reliability claim is made.
+![EventMesh failure-recovery demo](docs/assets/eventmesh-demo.gif)
 
-## Delivery status
+The demo above injects two real subscriber failures. One durable delivery
+recovers from `503 → 503 → 204`; every request has a valid signature and the
+same delivery ID.
 
-**Complete:** D0 foundation through D4 operational evidence
+## What this project proves
 
-**Next:** D5 portfolio presentation
+- **Concurrency correctness:** tenant-scoped idempotency is enforced by a
+  PostgreSQL uniqueness constraint and tested with simultaneous requests.
+- **Failure-aware design:** a transactional outbox closes the database/broker
+  dual-write gap; expiring leases make relay and worker crashes recoverable.
+- **Honest delivery semantics:** webhook delivery is at least once, with stable
+  IDs, exact-byte HMAC signing, immutable attempt history, DLQ, and linked replay.
+- **Operational readiness:** durable-state metrics, traces, failure drills, a
+  k6 benchmark, an application-only Helm chart, and a Kind smoke test are
+  reproducible from the repository.
 
-The current implementation accepts tenant-authenticated events, persists them in
-PostgreSQL with atomic idempotency semantics, and publishes versioned messages
-through a transactional outbox to Kafka. Matching subscriptions receive
-HMAC-signed webhooks with inspectable retries, immutable attempt history,
-dead-letter state, and operator replay. Observability packaging and Kubernetes
-are implemented through Prometheus, Grafana, OpenTelemetry/Tempo, and Helm. See
-[the delivery plan](docs/delivery-plan.md).
+## Architecture in 60 seconds
 
-## Why this shape?
-
-EventMesh is not a collection of infrastructure keywords. It is one concrete
-product with an increasingly strong reliability model:
-
-1. accept an event durably;
-2. publish accepted work without losing it;
-3. deliver signed webhooks despite transient failures;
-4. expose enough evidence to debug and measure the system;
-5. package the same application for a laptop, CI, or Kubernetes.
-
-The architecture and rejected alternatives are documented in
-[the architecture overview](docs/architecture.md) and
-[architecture decision records](docs/adrs/README.md).
-
-## Prerequisites
-
-- Java 21
-- Docker with Compose v2
-
-Maven does not need to be installed; the repository includes Maven Wrapper.
-
-On macOS with Homebrew:
-
-```bash
-brew install openjdk@21
-export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"
-export JAVA_HOME="/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home"
+```mermaid
+flowchart LR
+    P["Producer"] -->|"API key + idempotency key"| A["Ingress API"]
+    A -->|"event + intent<br/>one transaction"| DB[("PostgreSQL")]
+    DB --> O["Leased outbox relay"]
+    O --> K[("Kafka")]
+    K --> F["Idempotent fan-out"]
+    F --> DB
+    DB --> W["Leased delivery worker"]
+    W -->|"HMAC-signed webhook"| S["Subscriber"]
+    W -->|"attempt + state"| DB
+    A -.-> T["Prometheus + OpenTelemetry"]
+    O -.-> T
+    W -.-> T
 ```
 
-## Run locally
+This is deliberately one deployable application with explicit module
+boundaries. PostgreSQL owns correctness, Kafka decouples ingress from fan-out,
+and telemetry remains outside the correctness path. The full rationale and
+rejected alternatives are in the
+[architecture overview](docs/architecture.md) and
+[19 decision records](docs/adrs/README.md).
+
+## Run the proof
+
+Prerequisites: Java 21, Docker with Compose v2, Python 3, and `jq`. Maven is
+included through Maven Wrapper.
+
+```bash
+./scripts/demo.sh
+```
+
+That one command builds the application, starts PostgreSQL, Kafka, EventMesh,
+and a deterministic subscriber, runs the injected-failure scenario, validates
+the result, and prints the attempt ledger. Initial image and dependency
+downloads can make the first run longer.
+
+To start the normal development stack and run its public-API smoke test:
 
 ```bash
 ./scripts/dev-up.sh
 ```
 
-The script builds the JAR with Maven Wrapper, packages it into the same Java 21
-runtime image used by the public Dockerfile, waits for readiness, and executes a
-public-API smoke test. This path also works on networks that inject a private
-TLS certificate unavailable inside build containers.
-
-The hermetic CI/release-image path is:
-
-```bash
-docker compose up --build
-```
-
-When the application is healthy:
+Then explore the live contract at
+[Swagger UI](http://localhost:8088/swagger-ui.html), or submit an event:
 
 ```bash
 curl --fail-with-body \
@@ -89,63 +88,57 @@ curl --fail-with-body \
   }'
 ```
 
-The development key is public by design and is valid only for the seeded local
-tenant. It must never be reused outside local development.
+The checked-in key is valid only for the seeded local tenant. See
+[copyable API examples](docs/api-examples.md) for subscriptions, inspection,
+and replay.
 
-## Verify
+## Evidence at a glance
+
+| Claim | Reproduce | Reviewed result |
+|---|---|---|
+| Unit and real-service integration suite | `./scripts/verify.sh` | PostgreSQL, Kafka, HTTP subscriber, API contract, and coverage gate |
+| Signed retry recovery | `./scripts/demo.sh` | `503 → 503 → 204`, valid HMAC, stable delivery ID |
+| Kafka outage recovery | `./scripts/failure-broker.sh` | Pending outbox survived; observed publish 681 ms after unpause |
+| Worker restart recovery | `./scripts/failure-worker-restart.sh` | Retry state survived; observed success 3,528 ms after restart |
+| Durable ingress performance | `./scripts/benchmark.sh` | 36,667 requests, 1,831.82 req/s, 12.10 ms p95, 0 failures |
+| Kubernetes portability | `./scripts/kind-smoke.sh` | Same image became ready through Helm and accepted an event |
+
+The benchmark is a bounded 10-VU, 20-second laptop measurement of the atomic
+event-plus-outbox ingress transaction. It is **not** an end-to-end webhook
+throughput claim; the relay backlog is reported with the result. Environment,
+limitations, and raw methodology are in the
+[reviewed evidence report](docs/evidence/d4-local-2026-07-29.md).
+
+Every headline claim maps to code, tests, commands, and bounded evidence in the
+[claim matrix](docs/evidence/claim-matrix.md).
+
+## Observe and test
 
 ```bash
 ./scripts/verify.sh
-```
-
-The verification suite includes unit tests, PostgreSQL and Kafka integration
-tests through Testcontainers, a real broker pause/recovery scenario, API
-behavior tests, and a coverage gate. The script discovers the active Docker
-context, including Rancher Desktop and Docker Desktop.
-
-## Run the failure/recovery demo
-
-```bash
-./scripts/demo.sh
-```
-
-The script starts a separate subscriber container, configures it to return two
-planned `503` responses, registers a subscription, submits an event, and waits
-for delivery to succeed. Its final JSON shows three attempts with the same
-delivery ID and a valid signature on every request.
-
-## Observe and break it safely
-
-```bash
 ./scripts/observability-up.sh
 ./scripts/failure-broker.sh
 ./scripts/failure-worker-restart.sh
-```
-
-The first command provisions the operations dashboard, Prometheus, an
-OpenTelemetry Collector, and Tempo. The failure drills verify that database
-state survives a paused broker and a terminated worker, and print a new recovery
-measurement on every run.
-
-## Benchmark and Kubernetes proof
-
-```bash
 ./scripts/benchmark.sh
 ./scripts/kind-smoke.sh
 ```
 
-The benchmark measures durable ingress only and writes a raw k6 summary under
-`reports/`. The Kind smoke test loads the same local OCI image, installs the
-application-only Helm chart, waits for readiness, and submits an authenticated
-event. See [the reviewed local evidence](docs/evidence/d4-local-2026-07-29.md)
-for measured results and limitations.
+The optional observability stack provisions Prometheus, Grafana, an
+OpenTelemetry Collector, and Tempo. The operations guide explains what each
+signal means and how to diagnose backlogs without treating telemetry as state.
 
-## Documentation map
+## Review paths
 
-Start at [docs/README.md](docs/README.md). For interview preparation, use
-[docs/interview-guide.md](docs/interview-guide.md).
+- **60 seconds:** this README and the demo recording.
+- **5 minutes:** [recruiter review guide](docs/recruiter-guide.md) and
+  [claim matrix](docs/evidence/claim-matrix.md).
+- **15 minutes:** [interview guide](docs/interview-guide.md),
+  [reliability model](docs/reliability-model.md), and
+  [decision records](docs/adrs/README.md).
+- **Hands-on:** [API examples](docs/api-examples.md),
+  [testing strategy](docs/testing-strategy.md), and
+  [operations runbook](docs/runbook.md).
 
-## Project status
-
-EventMesh is under active development. Only completed delivery gates are
-described as implemented; planned capabilities are labeled explicitly.
+EventMesh is feature-complete for its portfolio scope. The
+[delivery plan](docs/delivery-plan.md) shows the five independently verified
+increments used to build it.
