@@ -112,6 +112,12 @@ limitations, and raw methodology are in the
 Every headline claim maps to code, tests, commands, and bounded evidence in the
 [claim matrix](docs/evidence/claim-matrix.md).
 
+The [GitHub Actions gate](.github/workflows/verify.yml) runs the verification
+suite, validates Compose and Helm contracts, builds the OCI image, and uploads
+test/coverage artifacts. The
+[D5 final report](docs/evidence/d5-final-2026-07-29.md) records the full local
+gate and clean-checkout reviewer path.
+
 ## Observe and test
 
 ```bash

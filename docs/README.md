@@ -23,13 +23,15 @@ implementation details without reverse-engineering the codebase.
 13. [D4 benchmark methodology](benchmarks.md) — scope and interpretation.
 14. [D4 Kubernetes/Helm](kubernetes.md) — portable deployment contract.
 15. [D4 measured evidence](evidence/d4-local-2026-07-29.md) — bounded local results.
-16. [Reliability model](reliability-model.md) — what is and is not guaranteed.
-17. [Platform portability](platform-portability.md) — cloud-neutral constraints.
-18. [Security model](security-model.md) — threat boundaries and key handling.
-19. [Testing strategy](testing-strategy.md) — evidence at each test layer.
-20. [Interview guide](interview-guide.md) — concise explanations and tradeoffs.
-21. [Resume bullets](resume-bullets.md) — bounded, evidence-backed wording.
-22. [Architecture decision records](adrs/README.md) — decisions and alternatives.
+16. [D5 final verification](evidence/d5-final-2026-07-29.md) — full gate and
+   clean-checkout reviewer path.
+17. [Reliability model](reliability-model.md) — what is and is not guaranteed.
+18. [Platform portability](platform-portability.md) — cloud-neutral constraints.
+19. [Security model](security-model.md) — threat boundaries and key handling.
+20. [Testing strategy](testing-strategy.md) — evidence at each test layer.
+21. [Interview guide](interview-guide.md) — concise explanations and tradeoffs.
+22. [Resume bullets](resume-bullets.md) — bounded, evidence-backed wording.
+23. [Architecture decision records](adrs/README.md) — decisions and alternatives.
 
 ## Documentation rules
 
