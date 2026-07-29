@@ -139,6 +139,21 @@ class EventIngestionIT {
   }
 
   @Test
+  void exposesAReviewerFriendlyOpenApiContract() throws Exception {
+    mockMvc
+        .perform(get("/v3/api-docs"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.info.title").value("EventMesh API"))
+        .andExpect(jsonPath("$.paths['/v1/events']").exists())
+        .andExpect(jsonPath("$.paths['/v1/subscriptions']").exists())
+        .andExpect(jsonPath("$.paths['/v1/deliveries/{deliveryId}/replay']").exists())
+        .andExpect(
+            jsonPath(
+                    "$.components.securitySchemes.eventMeshApiKey.name")
+                .value("X-EventMesh-Key"));
+  }
+
+  @Test
   void replaysTheOriginalEventForEquivalentRequests() throws Exception {
     var first =
         postEvent(LOCAL_API_KEY, "safe-retry-1", validEventJson(4200), 201)
