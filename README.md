@@ -46,10 +46,10 @@ flowchart LR
 
 This is deliberately one deployable application with explicit module
 boundaries. PostgreSQL owns correctness, Kafka decouples ingress from fan-out,
-and telemetry remains outside the correctness path. The full rationale and
-rejected alternatives are in the
-[architecture overview](docs/architecture.md) and
-[19 decision records](docs/adrs/README.md).
+and telemetry remains outside the correctness path. The public documentation
+covers the [API contract](docs/api-contract.md),
+[testing strategy](docs/testing-strategy.md), and
+[operations runbook](docs/runbook.md).
 
 ## Run the proof
 
@@ -106,17 +106,12 @@ and replay.
 The benchmark is a bounded 10-VU, 20-second laptop measurement of the atomic
 event-plus-outbox ingress transaction. It is **not** an end-to-end webhook
 throughput claim; the relay backlog is reported with the result. Environment,
-limitations, and raw methodology are in the
-[reviewed evidence report](docs/evidence/d4-local-2026-07-29.md).
-
-Every headline claim maps to code, tests, commands, and bounded evidence in the
-[claim matrix](docs/evidence/claim-matrix.md).
+limitations, and reproduction steps are in the
+[benchmark methodology](docs/benchmarks.md).
 
 The [GitHub Actions gate](.github/workflows/verify.yml) runs the verification
 suite, validates Compose and Helm contracts, builds the OCI image, and uploads
-test/coverage artifacts. The
-[D5 final report](docs/evidence/d5-final-2026-07-29.md) records the full local
-gate and clean-checkout reviewer path.
+test and coverage artifacts.
 
 ## Observe and test
 
@@ -136,15 +131,13 @@ signal means and how to diagnose backlogs without treating telemetry as state.
 ## Review paths
 
 - **60 seconds:** this README and the demo recording.
-- **5 minutes:** [recruiter review guide](docs/recruiter-guide.md) and
-  [claim matrix](docs/evidence/claim-matrix.md).
-- **15 minutes:** [interview guide](docs/interview-guide.md),
-  [reliability model](docs/reliability-model.md), and
-  [decision records](docs/adrs/README.md).
+- **5 minutes:** [API contract](docs/api-contract.md) and
+  [copyable examples](docs/api-examples.md).
+- **15 minutes:** [testing strategy](docs/testing-strategy.md),
+  [observability guide](docs/observability.md), and
+  [Kubernetes guide](docs/kubernetes.md).
 - **Hands-on:** [API examples](docs/api-examples.md),
   [testing strategy](docs/testing-strategy.md), and
   [operations runbook](docs/runbook.md).
 
-EventMesh is feature-complete for its portfolio scope. The
-[delivery plan](docs/delivery-plan.md) shows the five independently verified
-increments used to build it.
+EventMesh is feature-complete for its portfolio scope.
