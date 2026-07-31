@@ -8,6 +8,11 @@ intent in one PostgreSQL transaction, then delivers matching webhooks with
 HMAC signatures, retry history, dead-letter state, and replay. It is a Java 21
 modular monolith packaged for Docker Compose and Kubernetes without a cloud SDK.
 
+> **Repository history:** The original Git repository was lost after the project
+> was built. Commits dated July 2–29, 2026 reconstruct the development sequence
+> from recovered source snapshots. Their boundaries and timestamps are
+> approximate; the code and project artifacts are the recovered work.
+
 ![EventMesh failure-recovery demo](docs/assets/eventmesh-demo.gif)
 
 The demo above injects two real subscriber failures. One durable delivery
