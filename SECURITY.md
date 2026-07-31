@@ -21,7 +21,3 @@ Never commit:
 - database credentials;
 - cloud credentials;
 - captured customer payloads.
-
-The evolving security model is documented in
-[docs/security-model.md](docs/security-model.md).
-

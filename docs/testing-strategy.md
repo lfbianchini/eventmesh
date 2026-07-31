@@ -107,9 +107,8 @@ D4 k6 tests publish:
 - error rate.
 
 Benchmark results are not regression tests unless the environment is controlled.
-The benchmark contract and reviewed local run are documented in
-[benchmarks.md](benchmarks.md) and
-[the D4 evidence report](evidence/d4-local-2026-07-29.md).
+The benchmark contract and reproduction instructions are documented in
+[benchmarks.md](benchmarks.md).
 
 ### Observability and deployment tests
 

@@ -29,8 +29,8 @@ EVENTMESH_BENCHMARK_DURATION=60s \
 ```
 
 The raw k6 summary is written to `reports/k6/summary.json` and is intentionally
-ignored by Git. Reviewed measurements belong in `docs/evidence/` with the exact
-environment.
+ignored by Git. Any published measurement should include the exact environment,
+command, and raw summary in its pull request or release notes.
 
 ## Interpretation
 
