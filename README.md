@@ -6,12 +6,7 @@ failure behavior visible and testable.**
 EventMesh accepts idempotent events, commits each event and its Kafka publication
 intent in one PostgreSQL transaction, then delivers matching webhooks with
 HMAC signatures, retry history, dead-letter state, and replay. It is a Java 21
-modular monolith packaged for Docker Compose and Kubernetes without a cloud SDK.
-
-> **Repository history:** The original Git repository was lost after the project
-> was built. Commits dated July 2–29, 2026 reconstruct the development sequence
-> from recovered source snapshots. Their boundaries and timestamps are
-> approximate; the code and project artifacts are the recovered work.
+modular monolith packaged for Docker Compose and Kubernetes without a cloud 
 
 ![EventMesh failure-recovery demo](docs/assets/eventmesh-demo.gif)
 
@@ -144,5 +139,3 @@ signal means and how to diagnose backlogs without treating telemetry as state.
 - **Hands-on:** [API examples](docs/api-examples.md),
   [testing strategy](docs/testing-strategy.md), and
   [operations runbook](docs/runbook.md).
-
-EventMesh is feature-complete for its portfolio scope.
