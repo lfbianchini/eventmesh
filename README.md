@@ -3,12 +3,23 @@
 **A multi-tenant event ingestion and signed-webhook delivery platform that makes
 failure behavior visible and testable.**
 
-EventMesh accepts idempotent events, commits each event and its Kafka publication
-intent in one PostgreSQL transaction, then delivers matching webhooks with
-HMAC signatures, retry history, dead-letter state, and replay. It is a Java 21
-modular monolith packaged for Docker Compose and Kubernetes without a cloud 
+In plain terms: an application sends EventMesh an event, such as "order
+placed," and EventMesh takes it from there. It stores the event durably, then
+delivers a signed webhook to every subscriber registered for that event type.
+If a subscriber is slow, down, or returns an error, EventMesh retries on a
+backoff schedule, records every attempt, and gives an operator a way to
+inspect and replay failed deliveries instead of dropping them silently.
 
-> **Repository note:** This project was developed in a private/local repository during July 2026 and published publicly on July 31, 2026, after documentation, verification artifacts, and cleanup were completed. The original development timeline is reflected in the commit history.
+Underneath that: EventMesh accepts idempotent events, commits each event and
+its Kafka publication intent in one PostgreSQL transaction, then delivers
+matching webhooks with HMAC signatures, retry history, dead-letter state, and
+replay. It is a Java 21 modular monolith packaged for Docker Compose and
+Kubernetes without a cloud SDK.
+
+> **Repository note:** This project was developed in a private/local
+> repository during July 2026 and published publicly on July 31, 2026, after
+> documentation, verification artifacts, and cleanup were completed. The
+> original development timeline is reflected in the commit history.
 
 ![EventMesh failure-recovery demo](docs/assets/eventmesh-demo.gif)
 

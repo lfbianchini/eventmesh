@@ -44,8 +44,8 @@ It also graphs process-lifetime outbox and webhook outcomes:
 
 ## Why both gauges and counters?
 
-Counters answer “what has this process done since it started?” They reset after
-a restart and therefore cannot answer “what work exists right now?”
+Counters answer "what has this process done since it started?" They reset after
+a restart and therefore cannot answer "what work exists right now?"
 
 EventMesh snapshots authoritative PostgreSQL counts into gauges every five
 seconds. A restarted instance reconstructs those values from durable state. The
@@ -69,7 +69,7 @@ EVENTMESH_OTLP_TRACING_ENDPOINT=http://otel-collector:4318/v1/traces
 
 Spring observations create traces for HTTP requests, Kafka operations, and
 scheduled relay/worker executions. Production should use a lower sampling rate
-and an external OTLP collector. The trace backend is not part of EventMesh’s
+and an external OTLP collector. The trace backend is not part of EventMesh's
 durability path; telemetry loss must not reject events or deliveries.
 
 ## Stop

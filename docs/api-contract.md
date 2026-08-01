@@ -41,7 +41,7 @@ Idempotency-Key: checkout-order-123-v1
 | `type` | Yes | 128 | Lowercase event identifier such as `order.created` |
 | `source` | Yes | 256 | Producer-defined application/component identity |
 | `subject` | No | 512 | Producer-defined resource identity |
-| `data` | Yes | — | Non-null JSON payload |
+| `data` | Yes | n/a | Non-null JSON payload |
 
 `Idempotency-Key` is required, tenant-scoped, non-blank, and at most 128
 characters.

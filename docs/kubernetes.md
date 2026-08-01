@@ -17,7 +17,7 @@ helm template eventmesh deploy/helm/eventmesh \
   --set secrets.existingSecret=eventmesh-secrets
 ```
 
-Create `eventmesh-secrets` through the platform’s secret manager with:
+Create `eventmesh-secrets` through the platform's secret manager with:
 
 - `database-password`;
 - `encryption-key`, a Base64-encoded random 256-bit key.
