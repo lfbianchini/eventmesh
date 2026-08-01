@@ -8,6 +8,8 @@ intent in one PostgreSQL transaction, then delivers matching webhooks with
 HMAC signatures, retry history, dead-letter state, and replay. It is a Java 21
 modular monolith packaged for Docker Compose and Kubernetes without a cloud 
 
+> **Repository note:** This project was developed in a private/local repository during July 2026 and published publicly on July 31, 2026, after documentation, verification artifacts, and cleanup were completed. The original development timeline is reflected in the commit history.
+
 ![EventMesh failure-recovery demo](docs/assets/eventmesh-demo.gif)
 
 The demo above injects two real subscriber failures. One durable delivery
